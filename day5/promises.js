@@ -1,3 +1,4 @@
+// Promise implementation
 class myPromise {
   constructor(executor) {
     this.state = 'pending';
@@ -128,3 +129,39 @@ class myPromise {
 //   .catch((reason) => {
 //     console.log(reason);
 //   });
+
+// Promise all implementation
+myPromise.prototype.promiseAll = function (promises) {
+  return new myPromise((resolve, reject) => {
+    let resolvedPromises = [];
+    let completedPromises = 0;
+
+    if (promises.length === 0) {
+      resolve([]);
+      return;
+    }
+
+    promises
+      .forEach((promise, index) => {
+        myPromise.resolve(promise).then((data) => {
+          resolvedPromises[index] = data;
+          completedPromises++;
+        });
+        if (promises.length === completedPromises.length) {
+          resolve(resolvedPromises);
+        }
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
+};
+
+//Promise.race implementation
+myPromise.prototype.promiseRace = (promises) => {
+  return new myPromise((resolve, reject) => {
+    promises.forEach((promise) => {
+      myPromise.resolve(promise).then(resolve).catch(reject);
+    });
+  });
+};
